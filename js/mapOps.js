@@ -7,6 +7,10 @@ var boundry = [];
 var boundrySet = [];
 //window.localStorage.removeItem('boundrySet');
 
+document.getElementById("vid").style.display = 'none';
+document.getElementById("homeDiv").style.display = 'block';
+
+
 var markCurrentPosition = function()
 {
 	if (navigator.geolocation) 
@@ -143,7 +147,9 @@ var coordinateSearch = function(boundrySet)
 						success: function(success)
 						{
 							if (!document.getElementById("vidSrc").getAttribute("src")) 
-							{
+							{	
+								document.getElementById("vid").style.display = 'block';
+								document.getElementById("homeDiv").style.display = 'none';
 								document.getElementById("vidSrc").setAttribute("src", "/media/toystory.mp4");
 								document.getElementById("vid").load();
 								document.getElementById("vid").play();
@@ -152,14 +158,18 @@ var coordinateSearch = function(boundrySet)
 						error: function(err)
 						{
 							console.log(err);
+							document.getElementById("vid").style.display = 'none';
+							document.getElementById("homeDiv").style.display = 'block';
 							document.getElementById("vidSrc").setAttribute("src", "");
 						}
 					});
 				}
 				else 
-				{
+				{	
+					document.getElementById("vid").style.display = 'none';
+					document.getElementById("homeDiv").style.display = 'block';
 					document.getElementById("vidSrc").setAttribute("src", "");
-					document.getElementById("content").innerHTML = "You are at :" + coordinates.lat() + " , " + coordinates.lng();
+					//document.getElementById("content").innerHTML = "You are at :" + coordinates.lat() + " , " + coordinates.lng();
 				}
 			},
 			function(err)

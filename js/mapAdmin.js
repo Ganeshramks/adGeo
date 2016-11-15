@@ -39,30 +39,42 @@ var initMap = function(pos)
 			zoom: 16
 		});
 
-	/*var drawingManager = new google.maps.drawing.DrawingManager(
+	var drawingManager = new google.maps.drawing.DrawingManager(
 		{
-			drawingMode : google.maps.drawing.OverlayType.MARKER,
-			drawingControl: true,
-			drawingControlOptions: {
-				position : google.maps.ControlPosition.TOP_CENTER,
+			drawingMode : google.maps.drawing.OverlayType.POLYGON,
+			drawingControl : true,
+			drawingControlOptions : {
+				position : google.maps.ControlPosition.TOP_LEFT,
 				drawingModes : ["polygon"]
+			},
+			polygonOptions : {
+				draggable : true,
+				editable : true,
+				fillColor : 'green',
+				fillOpacity : 0.25,
+				geodesic : true,
+				strokeWeight : 1 
 			}
 		});
 
-	drawingManager.setMap(map);*/
+	drawingManager.setMap(map);
 
-	google.maps.event.addListener(map, "click", function(e){
-		
-		var coordinates = {};
-		coordinates.lat = e.latLng.lat();
-		coordinates.lng = e.latLng.lng();
-		boundry.push(coordinates);
-
-		new google.maps.Marker({
-			position: e.latLng,
-			map: map
+	google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon)
+		{
+			var coordinatesArray = polygon.getPaths().getArray()[0].b;
+			boundrySet[boundrySet.length] = coordinatesArray;
+			if (confirm("Save Changes?")) 
+			{
+				window.localStorage.boundrySet = JSON.stringify(boundrySet);
+				alert("Saved the region");
+				polygon.setMap(map);
+			}
+			else
+			{
+				//remove the completed polygon
+				polygon.setMap(null);
+			}
 		});
-	});
 
 	if (window.localStorage.boundrySet) 
 	{
@@ -72,14 +84,11 @@ var initMap = function(pos)
 			var region = new google.maps.Polygon(
 				{
 					paths:boundrySet[i],
-					strokeColor: 'grey',
-	       			strokeOpacity: 0.8,
-	          		strokeWeight: 2,
+	          		strokeWeight: 1,
 	          		fillColor: 'green',
 	          		fillOpacity: 0.20
 				});
 			region.setMap(map);
-
 		};
 	}
 	else
@@ -91,19 +100,3 @@ var initMap = function(pos)
 };
 
 markCurrentPosition();
-
-var saveBoundry = function()
-{
-	if (boundry.length > 0) 
-	{
-		boundrySet[boundrySet.length] = boundry;
-		window.localStorage.boundrySet = JSON.stringify(boundrySet);
-		boundry=[];
-		alert("Saved");
-		window.location.reload(true);
-	}
-	else 
-	{
-		alert("Mark vertices please!");
-	}
-};
