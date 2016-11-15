@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Adgeo Admin</title>
+		<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no"/>
+		<style type="text/css">
+			html, body{
+				margin: 0;
+				height:100%;
+				width: 100%;
+			}
+			#map{
+				height: 90%;
+			}
+		</style>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCS0PG64GbRdru_fizH6GNAL3gffJua5vw&libraries=drawing,geometry"></script>
+	</head>
+	<body>
+		<div style="height:10%;">
+			<div style="height:95%;box-shadow:0 1px 7px grey;font-weight:bold;font-size:18px">
+				Click on the map to mark the vertices of a region
+				<button onclick="saveBoundry()" style="float:right;position:relative;top:34%;right:1.5%">Save Region</button>
+			</div>
+		</div>
+		<div id="map">
+
+		</div>
+		<script src="/res/mapAdmin.js"></script>
+	</body>	
+</html>
