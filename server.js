@@ -2,7 +2,14 @@ var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
 
+var AdminAPI = require('./js/API.js');
+
 var app = express();
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+	extended:true
+}));
 
 app.use('/res', express.static(path.join(__dirname, '/js')));
 app.use('/libs', express.static(path.join(__dirname, '/node_modules')));
@@ -22,6 +29,10 @@ app.get('/admin', function(req, res)
 	res.setHeader('Content-Type', 'text/html');
 	res.sendFile(path.join(__dirname, '/admin.html'));
 });
+
+app.get('/getRegions', AdminAPI.getRegions)
+
+app.post('/saveLocation', AdminAPI.saveRegion);
 
 app.get('/getMedia', function(req, res)
 {

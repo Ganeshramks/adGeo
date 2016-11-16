@@ -1,7 +1,6 @@
 var map = 0;
 var boundry = []; 
 var boundrySet = [];
-//window.localStorage.removeItem('boundrySet');
 
 var markCurrentPosition = function()
 {
@@ -25,7 +24,6 @@ var markCurrentPosition = function()
 			}, 
 			function(error)
 			{
-				console.log("error");
 				console.log(error);
 			});
 	}
@@ -53,7 +51,8 @@ var initMap = function(pos)
 				fillColor : 'green',
 				fillOpacity : 0.25,
 				geodesic : true,
-				strokeWeight : 1 
+				strokeWeight : 1,
+				strokeColor: 'blue' 
 			}
 		});
 
@@ -66,8 +65,23 @@ var initMap = function(pos)
 			if (confirm("Save Changes?")) 
 			{
 				window.localStorage.boundrySet = JSON.stringify(boundrySet);
-				alert("Saved the region");
-				polygon.setMap(map);
+				$.ajax({
+					url: 'saveLocation',
+					type: 'POST',
+					data: {
+						'coordinateSet' : JSON.stringify(coordinatesArray)
+					},
+					success: function(success)
+					{
+						alert("Saved the region");
+						polygon.setMap(map);
+					},
+					error: function(error)
+					{
+						alert("Error saving boundry!");
+						polygon.setMap(null);
+					}
+				});
 			}
 			else
 			{
@@ -76,27 +90,37 @@ var initMap = function(pos)
 			}
 		});
 
-	if (window.localStorage.boundrySet) 
-	{
-		boundrySet = JSON.parse(window.localStorage.boundrySet);
-
-		for (var i = 0; i < boundrySet.length; i++) {
-			var region = new google.maps.Polygon(
-				{
-					paths:boundrySet[i],
-	          		strokeWeight: 1,
-	          		fillColor: 'green',
-	          		fillOpacity: 0.20
-				});
-			region.setMap(map);
-		};
-	}
-	else
-	{
-		window.localStorage.boundrySet = boundrySet;
-	}
+	getRegions();
 
 	return map;
 };
 
 markCurrentPosition();
+
+var getRegions = function()
+{
+	$.ajax({
+		url: 'getRegions',
+		success: function(success){
+			if (success.status_code == 200) 
+			{
+				var regions = success.regions;
+				for (var i = 0; i < regions.length; i++) {
+					var coordinates = JSON.parse(regions[i].coordinates);
+					var region = new google.maps.Polygon({
+						paths:coordinates,
+						strokeWeight: 1,
+						strokeColor: '#A3CCFF',
+						strokeOpacity: 0.70,
+						fillColor: 'green',
+						fillOpacity: 0.20
+					});
+					region.setMap(map);
+				}
+			}
+		},
+		error: function(error){
+			console.log(error);
+		}
+	});
+};
