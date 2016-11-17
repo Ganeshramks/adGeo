@@ -6,7 +6,7 @@ module.exports.getRegions = function(req, res)
 {
 	var connection = mysqlConnection.createDBConnection();
 
-	var query = "SELECT * FROM locations";
+	var query = "SELECT * FROM regions";
 	connection.query(query, function(err, rows){
 		if (err) 
 		{
@@ -28,7 +28,7 @@ module.exports.saveRegion = function(req, res)
 {
 	var connection = mysqlConnection.createDBConnection();
 	var coordinateSet = req.body.coordinateSet;
-	var insertQuery = "INSERT INTO locations(coordinates) VALUES (?)";
+	var insertQuery = "INSERT INTO regions(coordinates) VALUES (?)";
 
 	connection.query(insertQuery, coordinateSet, function(err, result){
 		if (err) {

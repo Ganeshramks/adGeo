@@ -1,11 +1,7 @@
-/*
-	alert("Sai Ram");
-*/
-
 var map = 0;
+var prevRegionId = null;
 var boundry = []; 
 var boundrySet = [];
-//window.localStorage.removeItem('boundrySet');
 
 document.getElementById("vid").style.display = 'none';
 document.getElementById("homeDiv").style.display = 'block';
@@ -96,29 +92,37 @@ var initMap = function(pos)
 		window.localStorage.boundrySet = boundrySet;
 	}
 
+	getRegions();
+
 	return map;
 };
 
 markCurrentPosition();
 
-var saveBoundry = function()
+var getRegions = function()
 {
-	if (boundry.length > 0) 
-	{
-		boundrySet[boundrySet.length] = boundry;
-		window.localStorage.boundrySet = JSON.stringify(boundrySet);
-		boundry=[];
-		alert("Saved");
-	}
-	else 
-	{
-		alert("Mark vertices please!");
-	}
+	$.ajax({
+		url: 'getRegions',
+		success: function(success){
+			if (success.status_code == 200) 
+			{//parse coordinates
+				var regions = success.regions;
+				for (var i = 0; i < regions.length; i++) {
+					regions[i].coordinates = JSON.parse(regions[i].coordinates);
+				}
+				boundrySet = regions;
+			}
+		},
+		error: function(error){
+			console.log(error);
+		}
+	});
 };
 
 var coordinateSearch = function(boundrySet)
 {
 	var coordinates = {};
+	var regionId = null;
 	if (navigator.geolocation) 
 	{
 		navigator.geolocation.getCurrentPosition(
@@ -133,24 +137,33 @@ var coordinateSearch = function(boundrySet)
 
 				for (var i = 0; i < boundrySet.length; i++) 
 				{
-					var polygon = new google.maps.Polygon({paths: boundrySet[i]});
+					var polygon = new google.maps.Polygon({paths: boundrySet[i].coordinates});
 					isInside = google.maps.geometry.poly.containsLocation(coordinates, polygon);
 
 					if (isInside) 
+					{
+						regionId = boundrySet[i].id;
 						break;
+					}
 				}
 
-				if (isInside) 
+				if (isInside && (prevRegionId==null || prevRegionId!=regionId)) 
 				{
+					prevRegionId = regionId;
+					
 					$.ajax({
-						url: 'getMedia',
+						url: 'getAdForRegionId',
+						type: 'POST',
+						data: {
+							'regionId' : regionId
+						},
 						success: function(success)
 						{
 							if (!document.getElementById("vidSrc").getAttribute("src")) 
 							{	
 								document.getElementById("vid").style.display = 'block';
 								document.getElementById("homeDiv").style.display = 'none';
-								document.getElementById("vidSrc").setAttribute("src", "/media/toystory.mp4");
+								document.getElementById("vidSrc").setAttribute("src", "/media/"+success.filename);
 								document.getElementById("vid").load();
 								document.getElementById("vid").play();
 							}
@@ -158,17 +171,17 @@ var coordinateSearch = function(boundrySet)
 						error: function(err)
 						{
 							console.log(err);
+							document.getElementById("vidSrc").setAttribute("src", "");
 							document.getElementById("vid").style.display = 'none';
 							document.getElementById("homeDiv").style.display = 'block';
-							document.getElementById("vidSrc").setAttribute("src", "");
 						}
 					});
 				}
-				else 
+				else if (!isInside)
 				{	
+					document.getElementById("vidSrc").setAttribute("src", "");
 					document.getElementById("vid").style.display = 'none';
 					document.getElementById("homeDiv").style.display = 'block';
-					document.getElementById("vidSrc").setAttribute("src", "");
 					//document.getElementById("content").innerHTML = "You are at :" + coordinates.lat() + " , " + coordinates.lng();
 				}
 			},

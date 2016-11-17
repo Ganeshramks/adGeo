@@ -3,6 +3,7 @@ var path = require('path');
 var bodyParser = require('body-parser');
 
 var AdminAPI = require('./js/API.js');
+var MediaAPI = require('./js/mediaAPI.js');
 
 var app = express();
 
@@ -30,15 +31,11 @@ app.get('/admin', function(req, res)
 	res.sendFile(path.join(__dirname, '/admin.html'));
 });
 
-app.get('/getRegions', AdminAPI.getRegions)
+app.get('/getRegions', AdminAPI.getRegions);
 
 app.post('/saveLocation', AdminAPI.saveRegion);
 
-app.get('/getMedia', function(req, res)
-{
- 	res.status(200);
- 	res.send("OK");
-});
+app.post('/getAdForRegionId', MediaAPI.getAdForRegionId);
 
 server = app.listen(2000, function()
 {
