@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>AdGeo</title>
+		<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no"/>
+		<style type="text/css">
+			html, body{
+				margin: 0;
+				height:100%;
+				width: 100%;
+				background-color: #A3CCFF;
+			}
+		</style>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="/res/main.js"></script>
+	</head>
+	<body>
+		<div id="content"></div>
+		
+		<video id="vid" style="height:100%;width:100%;display:none;" autoplay controls>
+			<source id="vidSrc" type="video/mp4"></source>		
+		</video>
+		
+		<img style="height:100%;width:100%;display:none;" id="img">
+		
+		<div id="homeDiv" style="height:100%;width:100%;display:block;">
+			<h1 style="width:20%;text-align:center;position:relative;top:40%;left:40%;color:#767686;text-shadow:3px 1px 1px white">AdGeo</h1>
+		</div>
+	</body>	
+</html>
